@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
@@ -9,17 +9,31 @@ namespace DamageText;
 
 public class DamageTextConfig : BasePluginConfig
 {
+    public override int Version { get; set; } = 2;
+
     [JsonPropertyName("NormalSize")]
     public int NormalSize { get; set; } = 80;
+
+    [JsonPropertyName("NormalHeadshotSize")]
+    public int NormalHeadshotSize { get; set; } = 90;
 
     [JsonPropertyName("KillSize")]
     public int KillSize { get; set; } = 120;
 
+    [JsonPropertyName("KillHeadshotSize")]
+    public int KillHeadshotSize { get; set; } = 120;
+
     [JsonPropertyName("NormalColor")]
     public string NormalColor { get; set; } = "#ffffff";
 
+    [JsonPropertyName("NormalHeadshotColor")]
+    public string NormalHeadshotColor { get; set; } = "#ffff00";
+
     [JsonPropertyName("KillColor")]
     public string KillColor { get; set; } = "#ff0000";
+
+    [JsonPropertyName("KillHeadshotColor")]
+    public string KillHeadshotColor { get; set; } = "#ff0000";
     
     [JsonPropertyName("TextDisplayDuration")]
     public float TextDisplayDuration { get; set; } = 0.5f;
@@ -48,9 +62,9 @@ public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
     {
         CCSPlayerController? victim = @event.Userid;
         int damage = @event.DmgHealth;
-        int health = @event.Health;
-        // CCSPlayerController? attacker = @event.Attacker;
-        // string weapon = @event.Weapon;
+        CCSPlayerController? attacker = @event.Attacker;
+        bool headshot = @event.Hitgroup == 1;
+        bool kill = @event.Health <= 0; 
 
         if (
             victim == null || victim.PlayerPawn.Value == null || 
@@ -72,10 +86,39 @@ public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
         };
         ;
 
+        int size;
+        string color;
+        if (kill)
+        {
+            if (headshot)
+            {
+                color = Config.KillHeadshotColor;
+                size = Config.KillHeadshotSize;
+            }
+            else
+            {
+                color = Config.KillColor;
+                size = Config.KillSize;
+            }
+        }
+        else
+        {
+            if (headshot)
+            {
+                color = Config.NormalHeadshotColor;
+                size = Config.NormalHeadshotSize;
+            }
+            else
+            {
+                color = Config.NormalColor;
+                size = Config.NormalSize;
+            }
+        }
+
         ShowDamageText(
             damage.ToString(),
-            health == 0 ? Config.KillColor : Config.NormalColor,
-            health == 0 ? Config.KillSize : Config.NormalSize,
+            color,
+            size,
             position,
             angle
         );
