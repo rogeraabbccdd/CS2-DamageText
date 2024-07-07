@@ -75,16 +75,17 @@ public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
         {
             X = victim.PlayerPawn.Value.AbsOrigin.X + (float)GetRandomDouble(10, 15, false),
             Y = victim.PlayerPawn.Value.AbsOrigin.Y + (float)GetRandomDouble(10, 15, false),
-            Z = victim.PlayerPawn.Value.AbsOrigin.Z + (float)GetRandomDouble(20, 40)
+            Z = victim.PlayerPawn.Value.AbsOrigin.Z + (float)GetRandomDouble(20, 80)
         };
 
         QAngle angle = new QAngle
         {
             X = victim.PlayerPawn.Value.AbsRotation.X + 0.0f,
             Z = victim.PlayerPawn.Value.AbsRotation.Z + 90.0f,
-            Y = (float)GetRandomDouble(0, 360)
+            Y = (attacker == null || attacker.PlayerPawn.Value == null) ? 
+                (float)GetRandomDouble(0, 360) :
+                attacker.PlayerPawn.Value.EyeAngles.Y - 90f
         };
-        ;
 
         int size;
         string color;
