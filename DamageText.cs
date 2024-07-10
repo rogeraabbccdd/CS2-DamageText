@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
@@ -43,7 +43,7 @@ public class DamageTextConfig : BasePluginConfig
 public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
 {
     public override string ModuleName => "Damage Text";
-    public override string ModuleVersion => "1.0.0";
+    public override string ModuleVersion => "1.1.0";
     public override string ModuleAuthor => "Kento";
     public override string ModuleDescription => "Show damage text like RPG games :D";
     public DamageTextConfig Config { get; set; } = new();
