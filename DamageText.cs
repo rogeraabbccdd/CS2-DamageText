@@ -38,6 +38,9 @@ public class DamageTextConfig : BasePluginConfig
     
     [JsonPropertyName("TextDisplayDuration")]
     public float TextDisplayDuration { get; set; } = 0.5f;
+
+    [JsonPropertyName("EnableShadow")]
+    public bool EnableShadow { get; set; } = false;
 }
 
 public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
@@ -72,11 +75,28 @@ public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
             victim.PlayerPawn.Value.AbsOrigin == null || victim.PlayerPawn.Value.AbsRotation == null
         ) return HookResult.Continue;
 
+        if (
+            attacker == null || attacker.PlayerPawn.Value == null ||
+            attacker.PlayerPawn.Value.AbsOrigin == null || attacker.PlayerPawn.Value.AbsRotation == null
+        ) return HookResult.Continue;
+
+        //Ensure text is towards attacker, to avoid it spawning behind victim.
+        var offset = 40;
+        var attackerOrigin = attacker.PlayerPawn.Value!.AbsOrigin;
+        var victimOrigin = victim.PlayerPawn.Value!.AbsOrigin;
+        float deltaX = attackerOrigin.X - victimOrigin.X;
+        float deltaY = attackerOrigin.Y - victimOrigin.Y;
+        float deltaZ = attackerOrigin.Z - victimOrigin.Z;
+        float distance = (float)Math.Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        float newX = victimOrigin.X + (deltaX / distance) * offset;
+        float newY = victimOrigin.Y + (deltaY / distance) * offset;
+        float newZ = victimOrigin.Z + (deltaZ / distance) * offset;
+
         Vector position = new Vector
         {
-            X = victim.PlayerPawn.Value.AbsOrigin.X + (float)GetRandomDouble(10, 15, false),
-            Y = victim.PlayerPawn.Value.AbsOrigin.Y + (float)GetRandomDouble(10, 15, false),
-            Z = victim.PlayerPawn.Value.AbsOrigin.Z + (float)GetRandomDouble(20, 80)
+            X = newX + (float)GetRandomDouble(10, 15, false),
+            Y = newY + (float)GetRandomDouble(10, 15, false),
+            Z = newZ + (float)GetRandomDouble(20, 80)
         };
 
         QAngle angle = new QAngle
@@ -125,6 +145,21 @@ public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
             angle
         );
 
+        if (Config.EnableShadow)
+        {
+            float shadowX = position.X + (deltaX / distance) * -1;
+            float shadowY = position.Y + (deltaY / distance) * -1;
+            float shadowZ = position.Z + (deltaZ / distance) * -1;
+
+            ShowDamageText(
+                damage.ToString(),
+                "#080808",
+                size,
+                new Vector(shadowX, shadowY, shadowZ - (size * 0.005f)),
+                angle
+            );
+        }
+
         return HookResult.Continue;
     }
     public double GetRandomDouble(double min, double max, bool positive = true)
@@ -153,9 +188,9 @@ public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
         entity.Fullbright = true;
         entity.WorldUnitsPerPx = 0.1f;
         entity.DepthOffset = 0.0f;
+        entity.JustifyHorizontal = PointWorldTextJustifyHorizontal_t.POINT_WORLD_TEXT_JUSTIFY_HORIZONTAL_CENTER;
+        entity.JustifyVertical = PointWorldTextJustifyVertical_t.POINT_WORLD_TEXT_JUSTIFY_VERTICAL_CENTER;
         entity.Teleport(position, angle, new Vector(0,0,0));
-        
-        entity.DispatchSpawn();
 
         AddTimer(Config.TextDisplayDuration, entity.Remove);
     }
