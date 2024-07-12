@@ -17,3 +17,4 @@ Show damage text like RPG games :D
 |KillColor|Text color when player killed|#ff0000|
 |KillHeadshotColor|Text color when player killed and headshot|#ff0000|
 |TextDisplayDuration|Text display duration|0.5|
+|EnableShadow|Enable text shadow|false|

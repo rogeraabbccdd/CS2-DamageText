@@ -46,7 +46,7 @@ public class DamageTextConfig : BasePluginConfig
 public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
 {
     public override string ModuleName => "Damage Text";
-    public override string ModuleVersion => "1.1.0";
+    public override string ModuleVersion => "1.2.0";
     public override string ModuleAuthor => "Kento";
     public override string ModuleDescription => "Show damage text like RPG games :D";
     public DamageTextConfig Config { get; set; } = new();
