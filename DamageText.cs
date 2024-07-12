@@ -10,7 +10,7 @@ namespace DamageText;
 public class DamageTextConfig : BasePluginConfig
 {
     [JsonPropertyName("ConfigVersion")]
-    public override int Version { get; set; } = 2;
+    public override int Version { get; set; } = 3;
 
     [JsonPropertyName("NormalSize")]
     public int NormalSize { get; set; } = 80;
