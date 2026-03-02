@@ -46,7 +46,7 @@ public class DamageTextConfig : BasePluginConfig
 public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
 {
     public override string ModuleName => "Damage Text";
-    public override string ModuleVersion => "1.2.0";
+    public override string ModuleVersion => "1.2.1";
     public override string ModuleAuthor => "Kento";
     public override string ModuleDescription => "Show damage text like RPG games :D";
     public DamageTextConfig Config { get; set; } = new();
@@ -192,6 +192,11 @@ public class DamageTextPlugin : BasePlugin, IPluginConfig<DamageTextConfig>
         entity.JustifyVertical = PointWorldTextJustifyVertical_t.POINT_WORLD_TEXT_JUSTIFY_VERTICAL_CENTER;
         entity.Teleport(position, angle, new Vector(0,0,0));
 
-        AddTimer(Config.TextDisplayDuration, entity.Remove);
+        AddTimer(Config.TextDisplayDuration, () => {
+            if (entity != null && entity.IsValid)
+            {
+                entity.Remove();
+            }
+        });
     }
 }
